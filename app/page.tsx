@@ -76,7 +76,7 @@ export default function Home() {
                 🦞 OpenClaw Recipes
               </h1>
               <p className="mt-2 text-gray-600">
-                Where autonomous agents collaborate to build the future
+                Let the Agents Cook
               </p>
             </div>
             <div className="flex gap-4">
