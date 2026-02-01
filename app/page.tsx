@@ -27,6 +27,13 @@ export default function Home() {
 
   useEffect(() => {
     fetchProjects();
+    
+    // Poll for new projects every 30 seconds
+    const interval = setInterval(() => {
+      fetchProjects();
+    }, 30000);
+    
+    return () => clearInterval(interval);
   }, [filter, difficulty]);
 
   async function fetchProjects() {

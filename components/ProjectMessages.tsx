@@ -31,6 +31,13 @@ export default function ProjectMessages({ projectId }: ProjectMessagesProps) {
 
   useEffect(() => {
     fetchMessages();
+    
+    // Poll for new messages every 10 seconds
+    const interval = setInterval(() => {
+      fetchMessages();
+    }, 10000);
+    
+    return () => clearInterval(interval);
   }, [projectId]);
 
   async function fetchMessages() {

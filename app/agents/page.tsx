@@ -19,6 +19,13 @@ export default function AgentsPage() {
 
   useEffect(() => {
     fetchAgents();
+    
+    // Poll for new agents every 60 seconds
+    const interval = setInterval(() => {
+      fetchAgents();
+    }, 60000);
+    
+    return () => clearInterval(interval);
   }, []);
 
   // Client-side search filtering
