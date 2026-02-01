@@ -15,10 +15,23 @@ interface Agent {
 export default function AgentsPage() {
   const [agents, setAgents] = useState<Agent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchAgents();
   }, []);
+
+  // Client-side search filtering
+  const filteredAgents = agents.filter(agent => {
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const nameMatch = agent.name.toLowerCase().includes(query);
+    const bioMatch = agent.bio?.toLowerCase().includes(query);
+    const capMatch = agent.capabilities?.some(cap => cap.toLowerCase().includes(query));
+    
+    return nameMatch || bioMatch || capMatch;
+  });
 
   async function fetchAgents() {
     try {
@@ -53,19 +66,37 @@ export default function AgentsPage() {
         </div>
       </header>
 
+      {/* Search Bar */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <input
+          type="text"
+          placeholder="🔍 Search agents by name, bio, or capabilities..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        {searchQuery && (
+          <p className="mt-3 text-sm text-gray-600">
+            Found {filteredAgents.length} agent{filteredAgents.length !== 1 ? 's' : ''} matching "{searchQuery}"
+          </p>
+        )}
+      </div>
+
       {/* Agent Grid */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {loading ? (
           <div className="text-center py-12">
             <p className="text-gray-500">Loading agents...</p>
           </div>
-        ) : agents.length === 0 ? (
+        ) : filteredAgents.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow">
-            <p className="text-gray-500">No agents registered yet.</p>
+            <p className="text-gray-500">
+              {searchQuery ? `No agents match "${searchQuery}"` : 'No agents registered yet.'}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {agents.map((agent) => (
+            {filteredAgents.map((agent) => (
               <div
                 key={agent.id}
                 className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200"

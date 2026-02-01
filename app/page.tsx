@@ -22,16 +22,21 @@ export default function Home() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [difficulty, setDifficulty] = useState<string>('all');
 
   useEffect(() => {
     fetchProjects();
-  }, [filter]);
+  }, [filter, difficulty]);
 
   async function fetchProjects() {
     try {
       const params = new URLSearchParams();
       if (filter !== 'all') {
         params.set('status', filter);
+      }
+      if (difficulty !== 'all') {
+        params.set('difficulty', difficulty);
       }
 
       const response = await fetch(`/api/projects?${params.toString()}`);
@@ -46,6 +51,19 @@ export default function Home() {
       setLoading(false);
     }
   }
+
+  // Client-side filtering for search
+  const filteredProjects = projects.filter(project => {
+    if (!searchQuery) return true;
+    
+    const query = searchQuery.toLowerCase();
+    const titleMatch = project.title.toLowerCase().includes(query);
+    const descMatch = project.description.toLowerCase().includes(query);
+    const tagMatch = project.tags?.some(tag => tag.toLowerCase().includes(query));
+    const creatorMatch = project.creator.name.toLowerCase().includes(query);
+    
+    return titleMatch || descMatch || tagMatch || creatorMatch;
+  });
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
@@ -97,23 +115,61 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Filters */}
+      {/* Search & Filters */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <div className="flex gap-2">
-          {['all', 'proposed', 'active', 'complete'].map((status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                filter === status
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              {status === 'all' ? 'All Projects' : status.charAt(0).toUpperCase() + status.slice(1)}
-            </button>
-          ))}
+        {/* Search Bar */}
+        <div className="mb-4">
+          <input
+            type="text"
+            placeholder="🔍 Search projects by title, tags, description, or creator..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
         </div>
+        
+        {/* Filters */}
+        <div className="flex flex-wrap gap-4">
+          <div className="flex gap-2">
+            <span className="text-sm font-medium text-gray-700 py-2">Status:</span>
+            {['all', 'proposed', 'active', 'complete'].map((status) => (
+              <button
+                key={status}
+                onClick={() => setFilter(status)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
+                  filter === status
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
+          </div>
+          
+          <div className="flex gap-2">
+            <span className="text-sm font-medium text-gray-700 py-2">Difficulty:</span>
+            {['all', 'easy', 'medium', 'hard'].map((diff) => (
+              <button
+                key={diff}
+                onClick={() => setDifficulty(diff)}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors text-sm ${
+                  difficulty === diff
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-white text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {diff.charAt(0).toUpperCase() + diff.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+        
+        {searchQuery && (
+          <p className="mt-3 text-sm text-gray-600">
+            Found {filteredProjects.length} project{filteredProjects.length !== 1 ? 's' : ''} matching "{searchQuery}"
+          </p>
+        )}
       </div>
 
       {/* Project Grid */}
@@ -122,13 +178,15 @@ export default function Home() {
           <div className="text-center py-12">
             <p className="text-gray-500">Loading projects...</p>
           </div>
-        ) : projects.length === 0 ? (
+        ) : filteredProjects.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow">
-            <p className="text-gray-500">No projects found. Be the first to create one!</p>
+            <p className="text-gray-500">
+              {searchQuery ? `No projects match "${searchQuery}"` : 'No projects found. Be the first to create one!'}
+            </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {projects.map((project) => (
+            {filteredProjects.map((project) => (
               <Link
                 key={project.id}
                 href={`/projects/${project.id}`}
