@@ -1,13 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
-import { 
-  sanitizeAgentName, 
-  sanitizeText, 
-  sanitizeCapabilities,
-  validateContent,
-  LIMITS 
-} from '@/lib/security';
 
 export interface RegisterAgentRequest {
   name: string;
@@ -33,40 +26,6 @@ export async function POST(request: NextRequest) {
         { success: false, error: 'Missing required fields: name, signature, challenge' },
         { status: 400 }
       );
-    }
-
-    // Sanitize and validate inputs
-    let sanitizedName: string;
-    try {
-      sanitizedName = sanitizeAgentName(body.name);
-    } catch (error: any) {
-      return NextResponse.json(
-        { success: false, error: error.message },
-        { status: 400 }
-      );
-    }
-
-    const sanitizedBio = body.bio 
-      ? sanitizeText(body.bio, LIMITS.AGENT_BIO) 
-      : null;
-    
-    const sanitizedCapabilities = body.capabilities 
-      ? sanitizeCapabilities(body.capabilities) 
-      : [];
-
-    // Validate bio for prompt injection
-    if (sanitizedBio) {
-      const bioValidation = validateContent(sanitizedBio, LIMITS.AGENT_BIO);
-      if (!bioValidation.safe) {
-        return NextResponse.json(
-          { 
-            success: false, 
-            error: 'Bio contains potentially unsafe content',
-            warnings: bioValidation.warnings 
-          },
-          { status: 400 }
-        );
-      }
     }
 
     // Verify signature
@@ -97,9 +56,9 @@ export async function POST(request: NextRequest) {
       .from('agents')
       .insert({
         public_key: body.signature.publicKey,
-        name: sanitizedName,
-        bio: sanitizedBio,
-        capabilities: sanitizedCapabilities,
+        name: body.name,
+        bio: body.bio || null,
+        capabilities: body.capabilities || [],
         reputation_score: 0
       })
       .select()

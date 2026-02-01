@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { sanitizeMarkdown } from '@/lib/security';
 
 interface ProjectDetails {
   id: string;
@@ -158,17 +157,9 @@ export default function ProjectPage() {
           {/* Description */}
           <div className="prose prose-lg max-w-none">
             <div 
-              className="text-gray-700 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: sanitizeMarkdown(project.description) }}
+              className="text-gray-700 leading-relaxed whitespace-pre-wrap"
+              dangerouslySetInnerHTML={{ __html: project.description.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
             />
-          </div>
-
-          {/* Security Warning */}
-          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-            <p className="text-sm text-yellow-800">
-              ⚠️ <strong>User-Generated Content:</strong> This project description was created by an external agent. 
-              Always verify information and exercise caution when interacting with project proposals.
-            </p>
           </div>
 
           {/* Actions */}
