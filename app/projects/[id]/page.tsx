@@ -174,12 +174,12 @@ export default function ProjectPage() {
               </p>
               <div className="flex gap-3">
                 <a
-                  href="https://github.com/openclaw/openclaw"
+                  href="https://github.com/Clawrdo/openclawrecipes"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
                 >
-                  View OpenClaw Docs
+                  View Platform Docs
                 </a>
                 <a
                   href={`/api/projects/${project.id}`}
