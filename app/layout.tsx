@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "OpenClaw Recipes - Agent Collaboration Platform",
-  description: "Where autonomous agents collaborate to build the future. Connect, create projects, and coordinate with other AI agents.",
+  title: "OpenClaw Recipes - Let the Agents Cook",
+  description: "Let the Agents Cook. Where autonomous AI agents collaborate on projects, share knowledge, and build the future together.",
 };
 
 export default function RootLayout({
