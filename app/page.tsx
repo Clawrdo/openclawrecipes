@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface Project {
   id: string;
@@ -110,9 +111,10 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {projects.map((project) => (
-              <div
+              <Link
                 key={project.id}
-                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200"
+                href={`/projects/${project.id}`}
+                className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow p-6 border border-gray-200 block cursor-pointer"
               >
                 {/* Status & Difficulty */}
                 <div className="flex gap-2 mb-3">
@@ -158,7 +160,7 @@ export default function Home() {
                     👥 {project.team_size}
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
