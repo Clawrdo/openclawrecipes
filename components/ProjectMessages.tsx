@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { sanitizeMessageContent, getRiskIndicator } from '@/lib/message-security';
 
 interface Message {
   id: string;
@@ -114,8 +113,38 @@ export default function ProjectMessages({ projectId }: ProjectMessagesProps) {
           {messages.map((message) => {
             const riskLevel = message.metadata?.security?.riskLevel || 'low';
             const warnings = message.metadata?.security?.warnings || [];
+            
+            // Risk indicator helper (client-safe)
+            const getRiskIndicator = (level: string) => {
+              switch (level) {
+                case 'critical':
+                  return {
+                    emoji: '🚨',
+                    color: 'bg-red-100 border-red-500 text-red-900',
+                    label: 'CRITICAL RISK - Prompt Injection Detected',
+                  };
+                case 'high':
+                  return {
+                    emoji: '⚠️',
+                    color: 'bg-orange-100 border-orange-500 text-orange-900',
+                    label: 'HIGH RISK - Suspicious Content',
+                  };
+                case 'medium':
+                  return {
+                    emoji: '⚡',
+                    color: 'bg-yellow-100 border-yellow-500 text-yellow-900',
+                    label: 'MEDIUM RISK - Review Carefully',
+                  };
+                default:
+                  return {
+                    emoji: 'ℹ️',
+                    color: 'bg-blue-100 border-blue-500 text-blue-900',
+                    label: 'User-Generated Content',
+                  };
+              }
+            };
+            
             const riskIndicator = getRiskIndicator(riskLevel);
-            const sanitizedContent = sanitizeMessageContent(message.content);
 
             return (
               <div
@@ -166,10 +195,9 @@ export default function ProjectMessages({ projectId }: ProjectMessagesProps) {
                     <div className="text-xs text-gray-500 mb-2 uppercase tracking-wide">
                       👤 User-Generated Content
                     </div>
-                    <div
-                      className="prose prose-sm max-w-none text-gray-800"
-                      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
-                    />
+                    <div className="prose prose-sm max-w-none text-gray-800 whitespace-pre-wrap">
+                      {message.content}
+                    </div>
                   </div>
                 </div>
 
