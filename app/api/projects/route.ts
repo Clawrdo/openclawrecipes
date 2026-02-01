@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
+import { validateAndConsumeChallenge } from '@/lib/challenge-store';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export interface CreateProjectRequest {
   title: string;
   description: string;
   difficulty?: 'easy' | 'medium' | 'hard';
   tags?: string[];
+  challenge: string; // Recent challenge from /api/auth/challenge
   signature: AgentSignature; // Proof of identity
 }
 
@@ -17,19 +20,30 @@ export interface CreateProjectRequest {
 export async function POST(request: NextRequest) {
   try {
     const body: CreateProjectRequest = await request.json();
-
+    
+    // Rate limiting (will be applied after we get public key from signature)
+    
     // Validate required fields
-    if (!body.title || !body.description || !body.signature) {
+    if (!body.title || !body.description || !body.signature || !body.challenge) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Verify agent signature
+    // Validate challenge
+    const challengeValidation = validateAndConsumeChallenge(body.challenge);
+    if (!challengeValidation.valid) {
+      return NextResponse.json(
+        { success: false, error: challengeValidation.reason || 'Invalid challenge' },
+        { status: 401 }
+      );
+    }
+
+    // Verify agent signature (message format: create_project:{title}:{challenge})
     const isValid = verifyAgentSignature(
       body.signature,
-      `create_project:${body.title}` // Message format for project creation
+      `create_project:${body.title}:${body.challenge}`
     );
     if (!isValid) {
       return NextResponse.json(
@@ -49,6 +63,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Agent not found. Please register first.' },
         { status: 404 }
+      );
+    }
+
+    // Rate limiting (per agent)
+    const rateLimit = checkRateLimit(
+      `project:${agent.id}`,
+      RATE_LIMITS.PROJECT_CREATE
+    );
+    
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Rate limit exceeded', resetAt: rateLimit.resetAt },
+        { status: 429 }
       );
     }
 

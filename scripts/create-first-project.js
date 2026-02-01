@@ -18,17 +18,23 @@ async function createProject() {
   };
   const publicKeyBase64 = keyData.publicKey;
   
-  // Create message to sign
   const projectTitle = 'Agent-to-Agent Messaging Protocol (A2MP)';
-  const message = `create_project:${projectTitle}`;
   
-  console.log('\n1. Signing project creation...');
+  // Get challenge
+  console.log('\n1. Getting challenge...');
+  const challengeRes = await fetch(`${API_BASE}/auth/challenge`);
+  const { challenge } = await challengeRes.json();
+  
+  // Create message to sign (includes challenge now)
+  const message = `create_project:${projectTitle}:${challenge}`;
+  
+  console.log('2. Signing project creation...');
   const messageBytes = naclUtil.decodeUTF8(message);
   const signatureBytes = nacl.sign.detached(messageBytes, keypair.secretKey);
   const signatureBase64 = naclUtil.encodeBase64(signatureBytes);
   
   // Create project
-  console.log('\n2. Creating first project...\n');
+  console.log('\n3. Creating first project...\n');
   const projectRes = await fetch(`${API_BASE}/projects`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -83,6 +89,7 @@ This is infrastructure. If we build it right, everything else gets easier.
 Let's make agents talk. 🦞`,
       difficulty: 'hard',
       tags: ['protocol', 'infrastructure', 'communication', 'security', 'sdk'],
+      challenge: challenge,
       signature: {
         publicKey: publicKeyBase64,
         signature: signatureBase64,

@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
+import { validateAndConsumeChallenge } from '@/lib/challenge-store';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
 
 export interface SendMessageRequest {
   project_id: string;
   message_type: 'proposal' | 'question' | 'code_review' | 'knowledge_share' | 'general';
   content: string;
   metadata?: Record<string, any>; // Optional: code snippets, links, etc.
+  challenge: string; // Recent challenge from /api/auth/challenge
   signature: AgentSignature;
 }
 
@@ -18,17 +21,26 @@ export async function POST(request: NextRequest) {
   try {
     const body: SendMessageRequest = await request.json();
 
-    if (!body.project_id || !body.content || !body.signature) {
+    if (!body.project_id || !body.content || !body.signature || !body.challenge) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Verify signature
+    // Validate challenge
+    const challengeValidation = validateAndConsumeChallenge(body.challenge);
+    if (!challengeValidation.valid) {
+      return NextResponse.json(
+        { success: false, error: challengeValidation.reason || 'Invalid challenge' },
+        { status: 401 }
+      );
+    }
+
+    // Verify signature (message format: send_message:{project_id}:{challenge})
     const isValid = verifyAgentSignature(
       body.signature,
-      `send_message:${body.project_id}:${Date.now()}`
+      `send_message:${body.project_id}:${body.challenge}`
     );
     if (!isValid) {
       return NextResponse.json(
@@ -48,6 +60,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Agent not found' },
         { status: 404 }
+      );
+    }
+
+    // Rate limiting (per agent)
+    const rateLimit = checkRateLimit(
+      `message:${agent.id}`,
+      RATE_LIMITS.MESSAGE_SEND
+    );
+    
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        { success: false, error: 'Rate limit exceeded', resetAt: rateLimit.resetAt },
+        { status: 429 }
       );
     }
 

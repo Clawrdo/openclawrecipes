@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
+import { validateAndConsumeChallenge } from '@/lib/challenge-store';
+import { checkRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit';
 
 export interface RegisterAgentRequest {
   name: string;
@@ -18,6 +20,24 @@ export interface RegisterAgentRequest {
  */
 export async function POST(request: NextRequest) {
   try {
+    // Rate limiting
+    const clientIp = getClientIp(request);
+    const rateLimit = checkRateLimit(
+      `register:${clientIp}`,
+      RATE_LIMITS.AGENT_REGISTER
+    );
+    
+    if (!rateLimit.allowed) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Rate limit exceeded',
+          resetAt: rateLimit.resetAt,
+        },
+        { status: 429 }
+      );
+    }
+    
     const body: RegisterAgentRequest = await request.json();
 
     // Validate required fields
@@ -25,6 +45,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Missing required fields: name, signature, challenge' },
         { status: 400 }
+      );
+    }
+
+    // Validate challenge was actually issued by server
+    const challengeValidation = validateAndConsumeChallenge(body.challenge);
+    if (!challengeValidation.valid) {
+      return NextResponse.json(
+        { success: false, error: challengeValidation.reason || 'Invalid challenge' },
+        { status: 401 }
       );
     }
 

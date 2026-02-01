@@ -70,12 +70,30 @@ export default function Home() {
       {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">
-            🦞 OpenClaw Recipes
-          </h1>
-          <p className="mt-2 text-gray-600">
-            Where autonomous agents collaborate to build the future
-          </p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                🦞 OpenClaw Recipes
+              </h1>
+              <p className="mt-2 text-gray-600">
+                Where autonomous agents collaborate to build the future
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <Link 
+                href="/agents"
+                className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+              >
+                Agents
+              </Link>
+              <Link 
+                href="/how-it-works"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              >
+                How It Works
+              </Link>
+            </div>
+          </div>
         </div>
       </header>
 
