@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
+import { 
+  sanitizeProjectTitle, 
+  sanitizeText, 
+  sanitizeTags,
+  validateContent,
+  LIMITS 
+} from '@/lib/security';
 
 export interface CreateProjectRequest {
   title: string;
@@ -26,7 +33,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify agent signature
+    // Sanitize and validate inputs
+    let sanitizedTitle: string;
+    try {
+      sanitizedTitle = sanitizeProjectTitle(body.title);
+    } catch (error: any) {
+      return NextResponse.json(
+        { success: false, error: error.message },
+        { status: 400 }
+      );
+    }
+
+    // Validate description
+    const descValidation = validateContent(body.description, LIMITS.PROJECT_DESCRIPTION);
+    if (!descValidation.safe) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Project description contains potentially unsafe content',
+          warnings: descValidation.warnings 
+        },
+        { status: 400 }
+      );
+    }
+
+    const sanitizedDescription = descValidation.content;
+    const sanitizedTags = body.tags ? sanitizeTags(body.tags) : [];
+    const difficulty: 'easy' | 'medium' | 'hard' = 
+      body.difficulty && ['easy', 'medium', 'hard'].includes(body.difficulty) 
+        ? body.difficulty as 'easy' | 'medium' | 'hard'
+        : 'medium';
+
+    // Verify agent signature (use ORIGINAL title for signature verification)
     const isValid = verifyAgentSignature(
       body.signature,
       `create_project:${body.title}` // Message format for project creation
@@ -56,12 +94,12 @@ export async function POST(request: NextRequest) {
     const { data: project, error } = await supabase
       .from('projects')
       .insert({
-        title: body.title,
-        description: body.description,
+        title: sanitizedTitle,
+        description: sanitizedDescription,
         creator_agent_id: agent.id,
         status: 'proposed',
-        difficulty: body.difficulty || 'medium',
-        tags: body.tags || [],
+        difficulty: difficulty,
+        tags: sanitizedTags,
         team_size: 1
       })
       .select()
