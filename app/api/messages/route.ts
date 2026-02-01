@@ -1,0 +1,164 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
+import { supabase } from '@/lib/supabase';
+
+export interface SendMessageRequest {
+  project_id: string;
+  message_type: 'proposal' | 'question' | 'code_review' | 'knowledge_share' | 'general';
+  content: string;
+  metadata?: Record<string, any>; // Optional: code snippets, links, etc.
+  signature: AgentSignature;
+}
+
+/**
+ * POST /api/messages
+ * Send a message to a project
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const body: SendMessageRequest = await request.json();
+
+    if (!body.project_id || !body.content || !body.signature) {
+      return NextResponse.json(
+        { success: false, error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Verify signature
+    const isValid = verifyAgentSignature(
+      body.signature,
+      `send_message:${body.project_id}:${Date.now()}`
+    );
+    if (!isValid) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid signature' },
+        { status: 401 }
+      );
+    }
+
+    // Get agent ID
+    const { data: agent } = await supabase
+      .from('agents')
+      .select('id, name')
+      .eq('public_key', body.signature.publicKey)
+      .single();
+
+    if (!agent) {
+      return NextResponse.json(
+        { success: false, error: 'Agent not found' },
+        { status: 404 }
+      );
+    }
+
+    // Verify agent is participant in project
+    const { data: participant } = await supabase
+      .from('project_participants')
+      .select('id')
+      .eq('project_id', body.project_id)
+      .eq('agent_id', agent.id)
+      .single();
+
+    if (!participant) {
+      return NextResponse.json(
+        { success: false, error: 'Must be a project participant to send messages' },
+        { status: 403 }
+      );
+    }
+
+    // Create message
+    const { data: message, error } = await supabase
+      .from('messages')
+      .insert({
+        project_id: body.project_id,
+        sender_agent_id: agent.id,
+        message_type: body.message_type || 'general',
+        content: body.content,
+        metadata: body.metadata || {}
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating message:', error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to send message' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: {
+        id: message.id,
+        content: message.content,
+        message_type: message.message_type,
+        created_at: message.created_at,
+        sender: {
+          name: agent.name
+        }
+      }
+    });
+  } catch (error) {
+    console.error('Error sending message:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
+ * GET /api/messages?project_id=xxx
+ * Get messages for a project
+ */
+export async function GET(request: NextRequest) {
+  try {
+    const searchParams = request.nextUrl.searchParams;
+    const projectId = searchParams.get('project_id');
+
+    if (!projectId) {
+      return NextResponse.json(
+        { success: false, error: 'project_id required' },
+        { status: 400 }
+      );
+    }
+
+    const { data: messages, error } = await supabase
+      .from('messages')
+      .select(`
+        id,
+        message_type,
+        content,
+        metadata,
+        created_at,
+        sender:sender_agent_id (
+          id,
+          name,
+          reputation_score
+        )
+      `)
+      .eq('project_id', projectId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching messages:', error);
+      return NextResponse.json(
+        { success: false, error: 'Failed to fetch messages' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      messages: messages || [],
+      count: messages?.length || 0
+    });
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    return NextResponse.json(
+      { success: false, error: 'Internal server error' },
+      { status: 500 }
+    );
+  }
+}
