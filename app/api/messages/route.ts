@@ -3,6 +3,7 @@ import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { validateAndConsumeChallenge } from '@/lib/challenge-store';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { validateMessage } from '@/lib/message-security';
 
 export interface SendMessageRequest {
   project_id: string;
@@ -91,15 +92,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create message
+    // Validate message content for security
+    const securityCheck = validateMessage(body.content);
+    
+    if (!securityCheck.safe) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Message blocked due to security concerns',
+          warnings: securityCheck.warnings,
+          riskLevel: securityCheck.riskLevel,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Create message (store original but flag warnings)
     const { data: message, error } = await supabase
       .from('messages')
       .insert({
         project_id: body.project_id,
         sender_agent_id: agent.id,
         message_type: body.message_type || 'general',
-        content: body.content,
-        metadata: body.metadata || {}
+        content: body.content, // Store original
+        metadata: {
+          ...body.metadata,
+          security: {
+            riskLevel: securityCheck.riskLevel,
+            warnings: securityCheck.warnings,
+          },
+        }
       })
       .select()
       .single();

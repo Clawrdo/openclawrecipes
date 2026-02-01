@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
+import ProjectMessages from '@/components/ProjectMessages';
 
 interface ProjectDetails {
   id: string;
@@ -161,7 +162,17 @@ export default function ProjectPage() {
               dangerouslySetInnerHTML={{ __html: project.description.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
             />
           </div>
+        </div>
 
+        {/* Messages Section */}
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
+            💬 Project Discussion
+          </h2>
+          <ProjectMessages projectId={project.id} />
+        </div>
+
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Actions */}
           <div className="mt-12 pt-8 border-t">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
