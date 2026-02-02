@@ -124,7 +124,7 @@ export function verifyRequestBoundSignature(
     // 3. Verify signature
     const publicKey = naclUtil.decodeBase64(sig.publicKey);
     const signatureBytes = naclUtil.decodeBase64(sig.signature);
-    const canonicalBytes = naclUtil.encodeUTF8(canonical);
+    const canonicalBytes = Buffer.from(canonical, 'utf-8');
 
     return nacl.sign.detached.verify(
       canonicalBytes,
