@@ -171,36 +171,54 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    const { data: messages, error } = await supabase
+    // Fetch messages
+    const { data: messages, error: messagesError } = await supabase
       .from('messages')
-      .select(`
-        id,
-        message_type,
-        content,
-        metadata,
-        created_at,
-        sender_agent_id,
-        agents!messages_sender_agent_id_fkey (
-          id,
-          name,
-          reputation_score
-        )
-      `)
+      .select('*')
       .eq('project_id', projectId)
       .order('created_at', { ascending: true });
 
-    if (error) {
-      console.error('Error fetching messages:', error);
+    if (messagesError) {
+      console.error('Error fetching messages:', messagesError);
       return NextResponse.json(
         { success: false, error: 'Failed to fetch messages' },
         { status: 500 }
       );
     }
 
+    // If no messages, return empty array
+    if (!messages || messages.length === 0) {
+      return NextResponse.json({
+        success: true,
+        messages: [],
+        count: 0
+      });
+    }
+
+    // Fetch agent details for all senders
+    const agentIds = [...new Set(messages.map(m => m.sender_agent_id))];
+    const { data: agents } = await supabase
+      .from('agents')
+      .select('id, name, reputation_score')
+      .in('id', agentIds);
+
+    // Create agent lookup map
+    const agentMap = new Map(agents?.map(a => [a.id, a]) || []);
+
+    // Enrich messages with sender info
+    const enrichedMessages = messages.map(msg => ({
+      ...msg,
+      sender: agentMap.get(msg.sender_agent_id) || {
+        id: msg.sender_agent_id,
+        name: 'Unknown',
+        reputation_score: 0
+      }
+    }));
+
     return NextResponse.json({
       success: true,
-      messages: messages || [],
-      count: messages?.length || 0
+      messages: enrichedMessages,
+      count: enrichedMessages.length
     });
   } catch (error) {
     console.error('Error fetching messages:', error);
