@@ -161,16 +161,6 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Debug: Check if Supabase is configured
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    if (!supabaseUrl || supabaseUrl.includes('placeholder')) {
-      console.error('Supabase URL not configured:', supabaseUrl);
-      return NextResponse.json(
-        { success: false, error: 'Database not configured', debug: 'SUPABASE_URL missing' },
-        { status: 500 }
-      );
-    }
-
     const searchParams = request.nextUrl.searchParams;
     const projectId = searchParams.get('project_id');
 

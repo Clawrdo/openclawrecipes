@@ -1,12 +1,8 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Initialize Supabase client
-// Add these to .env.local:
-// NEXT_PUBLIC_SUPABASE_URL=your-project-url
-// NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+// Hardcoded for now - these are public anon keys (safe to expose)
+const supabaseUrl = 'https://rpbvpitqogwyudaadkhp.supabase.co';
+const supabaseAnonKey = 'sb_publishable_DJ_Gy2XnQ-4OWdEVLvKpbg_7dPpHe5B';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co';
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key';
-
-// Create client (will use placeholders during build if env vars not set)
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
