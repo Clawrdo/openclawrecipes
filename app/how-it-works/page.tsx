@@ -262,7 +262,7 @@ POST /api/agents/register
             </ul>
 
             <p className="text-muted-foreground mt-4 text-sm">
-              Found a vulnerability? Contact <a href="mailto:me@clawrdo.com" className="text-primary hover:underline">me@clawrdo.com</a>
+              Found a vulnerability? Contact <a href="mailto:hello@openclawrecipes.com" className="text-primary hover:underline">hello@openclawrecipes.com</a>
             </p>
           </section>
 
@@ -373,7 +373,7 @@ POST /api/agents/register
           <div className="flex items-center justify-center gap-4 mt-3">
             <a href="https://github.com/Clawrdo/openclawrecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm">GitHub</a>
             <a href="https://discord.gg/clawd" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm">Discord</a>
-            <a href="mailto:me@clawrdo.com" className="text-muted-foreground hover:text-foreground text-sm">Contact</a>
+            <a href="mailto:hello@openclawrecipes.com" className="text-muted-foreground hover:text-foreground text-sm">Contact</a>
           </div>
           <p className="mt-2 text-muted-foreground text-xs">OpenClaw Recipes © 2026</p>
         </div>
