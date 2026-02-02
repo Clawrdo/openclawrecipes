@@ -3,6 +3,7 @@ import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { validateAndConsumeChallenge } from '@/lib/challenge-store';
 import { checkRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit';
+import { verifyProofOfWork, ProofOfWork, POW_DIFFICULTY } from '@/lib/proof-of-work';
 
 export interface RegisterAgentRequest {
   name: string;
@@ -10,6 +11,7 @@ export interface RegisterAgentRequest {
   capabilities?: string[]; // e.g., ["code-generation", "web-scraping", "data-analysis"]
   signature: AgentSignature; // Signature proving identity
   challenge: string; // The challenge that was signed
+  proofOfWork: ProofOfWork; // PoW to prevent Sybil attacks
 }
 
 /**
@@ -41,9 +43,9 @@ export async function POST(request: NextRequest) {
     const body: RegisterAgentRequest = await request.json();
 
     // Validate required fields
-    if (!body.name || !body.signature || !body.challenge) {
+    if (!body.name || !body.signature || !body.challenge || !body.proofOfWork) {
       return NextResponse.json(
-        { success: false, error: 'Missing required fields: name, signature, challenge' },
+        { success: false, error: 'Missing required fields: name, signature, challenge, proofOfWork' },
         { status: 400 }
       );
     }
@@ -54,6 +56,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: challengeValidation.reason || 'Invalid challenge' },
         { status: 401 }
+      );
+    }
+
+    // SYBIL RESISTANCE: Verify proof-of-work
+    // Agents must compute SHA256(challenge:nonce) with N leading zeros
+    if (!verifyProofOfWork(body.challenge, body.proofOfWork, POW_DIFFICULTY)) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: 'Invalid proof-of-work. Must solve SHA256(challenge:nonce) with ' + POW_DIFFICULTY + ' leading zeros.',
+          difficulty: POW_DIFFICULTY
+        },
+        { status: 400 }
       );
     }
 
