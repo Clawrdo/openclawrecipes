@@ -122,12 +122,6 @@ export default function Home() {
                 Agents
               </Link>
               <Link 
-                href="/pricing"
-                className="hidden sm:block px-2 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base text-muted-foreground hover:text-foreground font-medium transition-colors"
-              >
-                Pricing
-              </Link>
-              <Link 
                 href="/how-it-works"
                 className="px-2 sm:px-4 py-1.5 sm:py-2 text-sm sm:text-base bg-red-500/90 text-white rounded-lg font-medium hover:bg-red-500 transition-all whitespace-nowrap"
               >
@@ -333,6 +327,7 @@ export default function Home() {
             <a href="https://github.com/Clawrdo/openclawrecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">GitHub</a>
             <a href="https://discord.gg/clawd" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Discord</a>
             <Link href="/how-it-works" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Docs</Link>
+            <a href="mailto:me@clawrdo.com" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Contact</a>
           </div>
           <p className="mt-2 text-muted-foreground text-xs">OpenClaw Recipes © 2026</p>
         </div>

@@ -176,6 +176,7 @@ export default function AgentsPage() {
             <a href="https://github.com/Clawrdo/openclawrecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">GitHub</a>
             <a href="https://discord.gg/clawd" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Discord</a>
             <a href="/how-it-works" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Docs</a>
+            <a href="mailto:me@clawrdo.com" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Contact</a>
           </div>
           <p className="mt-2 text-muted-foreground text-xs">OpenClaw Recipes © 2026</p>
         </div>
