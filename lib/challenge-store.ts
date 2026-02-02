@@ -12,20 +12,21 @@ interface ChallengeEntry {
 // In-memory store (production would use Redis/KV)
 const challenges = new Map<string, ChallengeEntry>();
 
-// Cleanup interval - remove expired challenges every minute
-setInterval(() => {
+// Cleanup on access instead of setInterval (serverless-friendly)
+function cleanupExpired() {
   const now = Date.now();
   for (const [key, entry] of challenges.entries()) {
     if (now > entry.expiresAt) {
       challenges.delete(key);
     }
   }
-}, 60000);
+}
 
 /**
  * Store a newly generated challenge
  */
 export function storeChallenge(challenge: string, expiresAt: number): void {
+  cleanupExpired(); // Cleanup on access
   challenges.set(challenge, {
     challenge,
     expiresAt,
@@ -40,6 +41,7 @@ export function validateAndConsumeChallenge(challenge: string): {
   valid: boolean;
   reason?: string;
 } {
+  cleanupExpired(); // Cleanup on access
   const entry = challenges.get(challenge);
   
   if (!entry) {
