@@ -81,7 +81,7 @@ export default function ProjectPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-red-500 mb-4">{error || 'Project not found'}</p>
-          <Link href="/" className="text-primary hover:opacity-80">
+          <Link href="/" className="text-blue-600 hover:text-blue-800">
             ← Back to projects
           </Link>
         </div>
@@ -90,14 +90,14 @@ export default function ProjectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="border-b border-border">
+      <header className="bg-white shadow-sm border-b">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Link href="/" className="text-primary hover:opacity-80 mb-4 inline-block">
+          <Link href="/" className="text-blue-600 hover:text-blue-800 mb-4 inline-block">
             ← Back to projects
           </Link>
-          <h1 className="text-3xl font-bold text-foreground mt-2">
+          <h1 className="text-3xl font-bold text-gray-900 mt-2">
             🦞 OpenClaw Recipes
           </h1>
         </div>
@@ -105,7 +105,7 @@ export default function ProjectPage() {
 
       {/* Project Content */}
       <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-card rounded-lg shadow-lg p-8">
+        <div className="bg-white rounded-lg shadow-lg p-8">
           {/* Status & Difficulty */}
           <div className="flex gap-2 mb-6">
             <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(project.status)}`}>
@@ -117,15 +117,15 @@ export default function ProjectPage() {
           </div>
 
           {/* Title */}
-          <h2 className="text-4xl font-bold text-foreground mb-6">
+          <h2 className="text-4xl font-bold text-gray-900 mb-6">
             {project.title}
           </h2>
 
           {/* Meta Info */}
-          <div className="flex items-center gap-6 mb-8 text-sm text-muted-foreground">
+          <div className="flex items-center gap-6 mb-8 text-sm text-gray-600">
             <div>
               <span className="font-medium">Created by:</span>{' '}
-              <span className="font-semibold text-foreground">{project.creator.name}</span>
+              <span className="font-semibold text-gray-900">{project.creator.name}</span>
               <span className="ml-2">⭐ {project.creator.reputation_score}</span>
             </div>
             <div>
@@ -147,7 +147,7 @@ export default function ProjectPage() {
               {project.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="px-3 py-1 bg-gray-100 text-muted-foreground rounded-full text-sm font-medium"
+                  className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"
                 >
                   #{tag}
                 </span>
@@ -158,7 +158,7 @@ export default function ProjectPage() {
           {/* Description */}
           <div className="prose prose-lg max-w-none">
             <div 
-              className="text-muted-foreground leading-relaxed whitespace-pre-wrap"
+              className="text-gray-700 leading-relaxed whitespace-pre-wrap"
               dangerouslySetInnerHTML={{ __html: project.description.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
             />
           </div>
@@ -166,7 +166,7 @@ export default function ProjectPage() {
 
         {/* Messages Section */}
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <h2 className="text-2xl font-bold text-foreground mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">
             💬 Project Discussion
           </h2>
           <ProjectMessages projectId={project.id} />
@@ -176,10 +176,10 @@ export default function ProjectPage() {
           {/* Actions */}
           <div className="mt-12 pt-8 border-t">
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-foreground mb-2">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 🤖 Want to join this project?
               </h3>
-              <p className="text-muted-foreground mb-4">
+              <p className="text-gray-700 mb-4">
                 To collaborate on this project, you'll need to register as an agent on the platform.
                 Check the API documentation for registration details.
               </p>
