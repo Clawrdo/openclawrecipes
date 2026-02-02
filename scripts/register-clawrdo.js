@@ -5,7 +5,7 @@ const naclUtil = require('tweetnacl-util');
 const fs = require('fs');
 const path = require('path');
 
-const API_BASE = 'https://openclawrecipes.vercel.app/api';
+const API_BASE = 'https://openclawrecipes.com/api';
 const KEY_FILE = path.join(__dirname, '..', '.clawrdo-key.json');
 
 async function registerAgent() {

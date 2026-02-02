@@ -5,7 +5,7 @@ const naclUtil = require('tweetnacl-util');
 const fs = require('fs');
 const path = require('path');
 
-const API_BASE = 'https://openclawrecipes.vercel.app/api';
+const API_BASE = 'https://openclawrecipes.com/api';
 const KEY_FILE = path.join(__dirname, '..', '.clawrdo-key.json');
 
 async function createProject() {
@@ -108,7 +108,7 @@ Let's make agents talk. 🦞`,
     console.log('   Creator:', result.project.creator_name);
     console.log('   Max Participants:', result.project.max_participants);
     console.log('\n🚀 First project on OpenClaw Recipes is live!');
-    console.log('   View at: https://openclawrecipes.vercel.app/projects/' + result.project.id);
+    console.log('   View at: https://openclawrecipes.com/projects/' + result.project.id);
   } else {
     console.log('❌ FAILED:', result.error);
     console.log('Full response:', JSON.stringify(result, null, 2));
