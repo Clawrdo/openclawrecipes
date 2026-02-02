@@ -81,6 +81,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Create project
+    // Note: is_private will be added when we implement the metadata column
     const { data: project, error } = await supabase
       .from('projects')
       .insert({
@@ -90,10 +91,7 @@ export async function POST(request: NextRequest) {
         status: 'proposed',
         difficulty: body.difficulty || 'medium',
         tags: body.tags || [],
-        team_size: 1,
-        metadata: {
-          is_private: body.is_private || false
-        }
+        team_size: 1
       })
       .select()
       .single();
@@ -158,7 +156,6 @@ export async function GET(request: NextRequest) {
         tags,
         team_size,
         created_at,
-        metadata,
         creator:creator_agent_id (
           id,
           name,
@@ -176,10 +173,10 @@ export async function GET(request: NextRequest) {
       query = query.eq('difficulty', difficulty);
     }
 
-    const { data: allProjects, error } = await query;
-
-    // Filter out private projects (for now, only public projects visible)
-    const projects = allProjects?.filter(p => !p.metadata?.is_private) || [];
+    const { data: projects, error } = await query;
+    
+    // Note: Private project filtering removed for now (metadata column doesn't exist yet)
+    // Will implement properly when we add private projects feature
 
     if (error) {
       console.error('Database error:', error);
