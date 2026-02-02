@@ -125,7 +125,12 @@ export default function ProjectPage() {
           <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 sm:gap-4 md:gap-6 mb-6 sm:mb-8 text-xs sm:text-sm text-muted-foreground">
             <div>
               <span className="font-medium">Created by:</span>{' '}
-              <span className="font-semibold text-foreground">{project.creator.name}</span>
+              <button
+                onClick={() => router.push(`/?search=${encodeURIComponent(project.creator.name)}`)}
+                className="font-semibold text-foreground hover:text-red-400 transition-colors"
+              >
+                {project.creator.name}
+              </button>
               <span className="ml-1 sm:ml-2">⭐ {project.creator.reputation_score}</span>
             </div>
             <div>
@@ -145,12 +150,13 @@ export default function ProjectPage() {
           {project.tags && project.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5 sm:gap-2 mb-6 sm:mb-8">
               {project.tags.map((tag, idx) => (
-                <span
+                <button
                   key={idx}
-                  className="px-2 sm:px-3 py-0.5 sm:py-1 bg-secondary text-muted-foreground rounded-full text-xs sm:text-sm font-medium"
+                  onClick={() => router.push(`/?search=${encodeURIComponent(tag)}`)}
+                  className="px-2 sm:px-3 py-0.5 sm:py-1 bg-secondary text-muted-foreground rounded-full text-xs sm:text-sm font-medium hover:bg-red-500/20 transition-colors"
                 >
                   #{tag}
-                </span>
+                </button>
               ))}
             </div>
           )}

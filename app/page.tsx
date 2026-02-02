@@ -26,6 +26,17 @@ export default function Home() {
   const [difficulty, setDifficulty] = useState<string>('all');
 
   useEffect(() => {
+    // Initialize from URL search params (client-side only)
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const query = params.get('search');
+      if (query) {
+        setSearchQuery(decodeURIComponent(query));
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     fetchProjects();
     
     // Poll for new projects every 30 seconds
@@ -149,16 +160,16 @@ export default function Home() {
         </div>
         
         {/* Filters - Mobile Optimized */}
-        <div className="space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:gap-6 sm:items-center sm:justify-center">
+        <div className="space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:gap-4 sm:items-center sm:justify-center">
           {/* Status Filter */}
-          <div className="space-y-2 sm:space-y-0 sm:flex sm:gap-3 sm:items-center">
-            <span className="text-sm font-medium text-muted-foreground block sm:inline sm:min-w-[60px]">Status:</span>
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+          <div className="space-y-2 sm:space-y-0 sm:flex sm:gap-2 sm:items-center">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground block sm:inline sm:min-w-[50px]">Status:</span>
+            <div className="flex flex-wrap gap-1.5">
               {['all', 'proposed', 'active', 'complete'].map((status) => (
                 <button
                   key={status}
                   onClick={() => setFilter(status)}
-                  className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md font-medium transition-all text-xs sm:text-sm ${
+                  className={`px-2 py-1 rounded-md font-medium transition-all text-xs sm:text-sm ${
                     filter === status
                       ? 'bg-red-500/20 text-red-400 border border-red-500/50'
                       : 'bg-card text-muted-foreground hover:text-foreground hover:bg-secondary border border-border'
@@ -171,14 +182,14 @@ export default function Home() {
           </div>
           
           {/* Difficulty Filter */}
-          <div className="space-y-2 sm:space-y-0 sm:flex sm:gap-3 sm:items-center">
-            <span className="text-sm font-medium text-muted-foreground block sm:inline sm:min-w-[70px]">Difficulty:</span>
-            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+          <div className="space-y-2 sm:space-y-0 sm:flex sm:gap-2 sm:items-center">
+            <span className="text-xs sm:text-sm font-medium text-muted-foreground block sm:inline sm:min-w-[60px]">Difficulty:</span>
+            <div className="flex flex-wrap gap-1.5">
               {['all', 'easy', 'medium', 'hard'].map((diff) => (
                 <button
                   key={diff}
                   onClick={() => setDifficulty(diff)}
-                  className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-md font-medium transition-all text-xs sm:text-sm ${
+                  className={`px-2 py-1 rounded-md font-medium transition-all text-xs sm:text-sm ${
                     difficulty === diff
                       ? 'bg-red-500/20 text-red-400 border border-red-500/50'
                       : 'bg-card text-muted-foreground hover:text-foreground hover:bg-secondary border border-border'
@@ -242,12 +253,17 @@ export default function Home() {
                 {project.tags && project.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-3 sm:mb-4">
                     {project.tags.slice(0, 4).map((tag, idx) => (
-                      <span
+                      <button
                         key={idx}
-                        className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-secondary text-muted-foreground rounded text-xs"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setSearchQuery(tag);
+                        }}
+                        className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-secondary text-muted-foreground rounded text-xs hover:bg-red-500/20 transition-colors"
                       >
                         #{tag}
-                      </span>
+                      </button>
                     ))}
                     {project.tags.length > 4 && (
                       <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-muted-foreground text-xs">
@@ -260,7 +276,16 @@ export default function Home() {
                 {/* Footer */}
                 <div className="flex items-center justify-between text-xs sm:text-sm text-muted-foreground pt-3 sm:pt-4 border-t border-border">
                   <div className="truncate mr-2">
-                    <span className="font-medium text-foreground">{project.creator.name}</span>
+                    <button
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setSearchQuery(project.creator.name);
+                      }}
+                      className="font-medium text-foreground hover:text-red-400 transition-colors"
+                    >
+                      {project.creator.name}
+                    </button>
                     <span className="ml-1 sm:ml-2">⭐ {project.creator.reputation_score}</span>
                   </div>
                   <div className="flex-shrink-0">

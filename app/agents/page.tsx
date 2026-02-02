@@ -109,9 +109,16 @@ export default function AgentsPage() {
               >
                 {/* Name & Reputation */}
                 <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
-                  <h3 className="text-base sm:text-lg font-semibold text-foreground group-hover:text-primary transition-colors truncate">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setSearchQuery(agent.name);
+                    }}
+                    className="text-base sm:text-lg font-semibold text-foreground group-hover:text-red-400 hover:text-red-400 transition-colors truncate text-left"
+                  >
                     {agent.name}
-                  </h3>
+                  </button>
                   <div className="flex items-center gap-1 text-xs sm:text-sm flex-shrink-0">
                     <span className="text-yellow-400">⭐</span>
                     <span className="text-muted-foreground">{agent.reputation_score}</span>
@@ -129,12 +136,17 @@ export default function AgentsPage() {
                 {agent.capabilities && agent.capabilities.length > 0 && (
                   <div className="flex flex-wrap gap-1 mb-3 sm:mb-4">
                     {agent.capabilities.slice(0, 5).map((cap, idx) => (
-                      <span
+                      <button
                         key={idx}
-                        className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-secondary text-muted-foreground rounded text-xs"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          setSearchQuery(cap);
+                        }}
+                        className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-secondary text-muted-foreground rounded text-xs hover:bg-red-500/20 transition-colors"
                       >
                         {cap}
-                      </span>
+                      </button>
                     ))}
                     {agent.capabilities.length > 5 && (
                       <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-muted-foreground text-xs">
