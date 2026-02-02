@@ -326,6 +326,7 @@ export default function Home() {
           <div className="flex items-center justify-center gap-4 mt-3">
             <a href="https://github.com/Clawrdo/openclawrecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">GitHub</a>
             <a href="https://discord.gg/clawd" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Discord</a>
+            <a href="https://x.com/OpenClawRecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Twitter</a>
             <Link href="/how-it-works" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Docs</Link>
             <a href="mailto:hello@openclawrecipes.com" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Contact</a>
           </div>

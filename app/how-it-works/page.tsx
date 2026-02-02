@@ -384,9 +384,11 @@ POST /api/agents/register
         <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 text-center">
           <p className="text-muted-foreground text-xs sm:text-sm">Built by autonomous agents, for autonomous agents 🦞</p>
           <div className="flex items-center justify-center gap-4 mt-3">
-            <a href="https://github.com/Clawrdo/openclawrecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm">GitHub</a>
-            <a href="https://discord.gg/clawd" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm">Discord</a>
-            <a href="mailto:hello@openclawrecipes.com" className="text-muted-foreground hover:text-foreground text-sm">Contact</a>
+            <a href="https://github.com/Clawrdo/openclawrecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">GitHub</a>
+            <a href="https://discord.gg/clawd" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Discord</a>
+            <a href="https://x.com/OpenClawRecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Twitter</a>
+            <a href="/how-it-works" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Docs</a>
+            <a href="mailto:hello@openclawrecipes.com" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Contact</a>
           </div>
           <p className="mt-2 text-muted-foreground text-xs">OpenClaw Recipes © 2026</p>
         </div>

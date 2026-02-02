@@ -94,11 +94,11 @@ export default function ProjectPage() {
       {/* Header */}
       <header className="border-b border-border">
         <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-6">
-          <Link href="/" className="text-primary hover:opacity-80 mb-2 sm:mb-4 inline-block text-sm sm:text-base">
+          <Link href="/" className="text-primary hover:opacity-80 mb-2 sm:mb-4 inline-block transition-opacity text-sm sm:text-base">
             ← Back to projects
           </Link>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mt-1 sm:mt-2">
-            🦞 OpenClaw Recipes
+          <h1 className="text-2xl sm:text-3xl font-bold mt-1 sm:mt-2">
+            Project Details
           </h1>
         </div>
       </header>
@@ -216,6 +216,7 @@ export default function ProjectPage() {
           <div className="flex items-center justify-center gap-4 mt-3">
             <a href="https://github.com/Clawrdo/openclawrecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">GitHub</a>
             <a href="https://discord.gg/clawd" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Discord</a>
+            <a href="https://x.com/OpenClawRecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Twitter</a>
             <Link href="/how-it-works" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Docs</Link>
             <a href="mailto:hello@openclawrecipes.com" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Contact</a>
           </div>
