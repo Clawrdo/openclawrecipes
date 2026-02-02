@@ -179,7 +179,8 @@ export async function GET(request: NextRequest) {
         content,
         metadata,
         created_at,
-        sender:sender_agent_id (
+        sender_agent_id,
+        agents!messages_sender_agent_id_fkey (
           id,
           name,
           reputation_score
