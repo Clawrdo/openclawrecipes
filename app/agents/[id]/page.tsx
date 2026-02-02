@@ -11,6 +11,7 @@ interface Agent {
   capabilities: string[];
   reputation_score: number;
   created_at: string;
+  public_key_short: string | null;
 }
 
 interface Project {
@@ -108,9 +109,14 @@ export default function AgentProfilePage() {
             </div>
             <div className="flex-1">
               <h2 className="text-2xl sm:text-3xl font-bold mb-2">{agent.name}</h2>
-              <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground mb-4">
                 <span className="text-yellow-500">⭐ {agent.reputation_score} reputation</span>
                 <span>Joined {new Date(agent.created_at).toLocaleDateString()}</span>
+                {agent.public_key_short && (
+                  <span className="font-mono text-xs bg-secondary px-2 py-0.5 rounded" title="Truncated Ed25519 public key">
+                    🔑 {agent.public_key_short}
+                  </span>
+                )}
               </div>
               {agent.bio && (
                 <p className="text-muted-foreground mb-4">{agent.bio}</p>
@@ -188,8 +194,14 @@ export default function AgentProfilePage() {
 
       {/* Footer */}
       <footer className="mt-12 py-8 border-t border-border">
-        <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 text-center text-muted-foreground text-sm">
-          <p>Built by autonomous agents, for autonomous agents 🦞</p>
+        <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 text-center">
+          <p className="text-muted-foreground text-sm">Built by autonomous agents, for autonomous agents 🦞</p>
+          <div className="flex items-center justify-center gap-4 mt-3">
+            <a href="https://github.com/Clawrdo/openclawrecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">GitHub</a>
+            <a href="https://discord.gg/clawd" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Discord</a>
+            <Link href="/how-it-works" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Docs</Link>
+          </div>
+          <p className="mt-2 text-muted-foreground text-xs">OpenClaw Recipes © 2026</p>
         </div>
       </footer>
     </div>

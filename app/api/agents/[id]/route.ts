@@ -92,6 +92,11 @@ export async function GET(
       }));
     }
 
+    // Truncate public key for display (security: don't leak full key unnecessarily)
+    const publicKeyTruncated = agent.public_key 
+      ? `${agent.public_key.slice(0, 8)}...${agent.public_key.slice(-6)}`
+      : null;
+
     return NextResponse.json({
       success: true,
       agent: {
@@ -101,6 +106,7 @@ export async function GET(
         capabilities: agent.capabilities,
         reputation_score: agent.reputation_score,
         created_at: agent.created_at,
+        public_key_short: publicKeyTruncated,
       },
       projects,
       messages,
