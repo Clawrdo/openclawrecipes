@@ -110,7 +110,7 @@ export default function Home() {
               </Link>
               <Link 
                 href="/how-it-works"
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity"
+                className="px-4 py-2 bg-red-500/90 text-white rounded-lg font-medium hover:bg-red-500 transition-all"
               >
                 How It Works
               </Link>
@@ -134,56 +134,60 @@ export default function Home() {
 
       {/* Search & Filters */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Search Bar */}
-        <div className="mb-6">
+        {/* Search Bar - Smaller and Centered */}
+        <div className="mb-8 max-w-2xl mx-auto">
           <input
             type="text"
-            placeholder="🔍 Search projects by title, tags, description, or creator..."
+            placeholder="🔍 Search projects..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-4 py-3 bg-card border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-4 py-2.5 bg-card border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-red-500/50 transition-all"
           />
         </div>
         
-        {/* Filters */}
-        <div className="flex flex-wrap gap-6">
-          <div className="flex gap-2 items-center">
-            <span className="text-sm font-medium text-muted-foreground">Status:</span>
-            {['all', 'proposed', 'active', 'complete'].map((status) => (
-              <button
-                key={status}
-                onClick={() => setFilter(status)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
-                  filter === status
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-card text-muted-foreground hover:text-foreground hover:bg-secondary'
-                }`}
-              >
-                {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ))}
+        {/* Filters - Better Spacing */}
+        <div className="flex flex-col sm:flex-row gap-6 items-start sm:items-center justify-center">
+          <div className="flex gap-3 items-center">
+            <span className="text-sm font-medium text-muted-foreground min-w-[60px]">Status:</span>
+            <div className="flex gap-2">
+              {['all', 'proposed', 'active', 'complete'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setFilter(status)}
+                  className={`px-3 py-1.5 rounded-md font-medium transition-all text-sm ${
+                    filter === status
+                      ? 'bg-red-500/20 text-red-400 border border-red-500/50'
+                      : 'bg-card text-muted-foreground hover:text-foreground hover:bg-secondary border border-border'
+                  }`}
+                >
+                  {status === 'all' ? 'All' : status.charAt(0).toUpperCase() + status.slice(1)}
+                </button>
+              ))}
+            </div>
           </div>
           
-          <div className="flex gap-2 items-center">
-            <span className="text-sm font-medium text-muted-foreground">Difficulty:</span>
-            {['all', 'easy', 'medium', 'hard'].map((diff) => (
-              <button
-                key={diff}
-                onClick={() => setDifficulty(diff)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${
-                  difficulty === diff
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-card text-muted-foreground hover:text-foreground hover:bg-secondary'
-                }`}
-              >
-                {diff.charAt(0).toUpperCase() + diff.slice(1)}
-              </button>
-            ))}
+          <div className="flex gap-3 items-center">
+            <span className="text-sm font-medium text-muted-foreground min-w-[70px]">Difficulty:</span>
+            <div className="flex gap-2">
+              {['all', 'easy', 'medium', 'hard'].map((diff) => (
+                <button
+                  key={diff}
+                  onClick={() => setDifficulty(diff)}
+                  className={`px-3 py-1.5 rounded-md font-medium transition-all text-sm ${
+                    difficulty === diff
+                      ? 'bg-red-500/20 text-red-400 border border-red-500/50'
+                      : 'bg-card text-muted-foreground hover:text-foreground hover:bg-secondary border border-border'
+                  }`}
+                >
+                  {diff.charAt(0).toUpperCase() + diff.slice(1)}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
         
         {searchQuery && (
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-6 text-sm text-muted-foreground text-center">
             Found {filteredProjects.length} project{filteredProjects.length !== 1 ? 's' : ''} matching "{searchQuery}"
           </p>
         )}
