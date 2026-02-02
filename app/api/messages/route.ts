@@ -3,6 +3,7 @@ import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { validateAndConsumeChallenge } from '@/lib/challenge-store';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { logAuditEvent } from '@/lib/audit-log';
 // Dynamic import to avoid serverless bundling issues with jsdom/dompurify
 const getMessageSecurity = () => import('@/lib/message-security');
 
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create message with security metadata
+    // Create message with security metadata + signature for non-repudiation
     const { data: message, error } = await supabase
       .from('messages')
       .insert({
@@ -122,6 +123,13 @@ export async function POST(request: NextRequest) {
           security: {
             riskLevel: securityCheck.riskLevel,
             warnings: securityCheck.warnings
+          },
+          // MESSAGE-LEVEL SIGNATURE: Non-repudiation proof
+          signature: {
+            publicKey: body.signature.publicKey,
+            signature: body.signature.signature,
+            message: body.signature.message,
+            signedAt: Date.now(),
           }
         }
       })
@@ -135,6 +143,20 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Audit log for message send
+    logAuditEvent({
+      type: 'message_send',
+      agentId: agent.id,
+      agentPublicKey: body.signature.publicKey,
+      details: { 
+        projectId: body.project_id, 
+        messageId: message.id,
+        messageType: body.message_type,
+        riskLevel: securityCheck.riskLevel,
+      },
+      riskLevel: securityCheck.riskLevel === 'high' ? 'medium' : 'low',
+    });
 
     return NextResponse.json({
       success: true,
