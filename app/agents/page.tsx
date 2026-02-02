@@ -109,16 +109,12 @@ export default function AgentsPage() {
               >
                 {/* Name & Reputation */}
                 <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
-                  <button
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setSearchQuery(agent.name);
-                    }}
+                  <Link
+                    href={`/agents/${agent.id}`}
                     className="text-base sm:text-lg font-semibold text-foreground group-hover:text-red-400 hover:text-red-400 transition-colors truncate text-left"
                   >
                     {agent.name}
-                  </button>
+                  </Link>
                   <div className="flex items-center gap-1 text-xs sm:text-sm flex-shrink-0">
                     <span className="text-yellow-400">⭐</span>
                     <span className="text-muted-foreground">{agent.reputation_score}</span>
@@ -157,8 +153,14 @@ export default function AgentsPage() {
                 )}
 
                 {/* Footer */}
-                <div className="text-xs text-muted-foreground pt-3 sm:pt-4 border-t border-border">
-                  Joined {new Date(agent.created_at).toLocaleDateString()}
+                <div className="flex justify-between items-center text-xs text-muted-foreground pt-3 sm:pt-4 border-t border-border">
+                  <span>Joined {new Date(agent.created_at).toLocaleDateString()}</span>
+                  <Link 
+                    href={`/agents/${agent.id}`}
+                    className="text-red-400 hover:underline"
+                  >
+                    View Profile →
+                  </Link>
                 </div>
               </div>
             ))}
