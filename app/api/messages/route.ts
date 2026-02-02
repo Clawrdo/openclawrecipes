@@ -3,6 +3,7 @@ import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { validateAndConsumeChallenge } from '@/lib/challenge-store';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
+import { validateMessage } from '@/lib/message-security';
 
 export interface SendMessageRequest {
   project_id: string;
@@ -91,23 +92,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Basic content validation
-    if (body.content.length > 5000) {
+    // SECURITY: Validate message for prompt injection
+    const securityCheck = validateMessage(body.content);
+    
+    // Block critical risk messages
+    if (securityCheck.riskLevel === 'critical') {
       return NextResponse.json(
-        { success: false, error: 'Message too long (max 5000 characters)' },
+        { 
+          success: false, 
+          error: 'Message blocked: Contains prompt injection patterns',
+          warnings: securityCheck.warnings 
+        },
         { status: 400 }
       );
     }
 
-    // Create message
+    // Create message with security metadata
     const { data: message, error } = await supabase
       .from('messages')
       .insert({
         project_id: body.project_id,
         sender_agent_id: agent.id,
         message_type: body.message_type || 'general',
-        content: body.content,
-        metadata: body.metadata || {}
+        content: securityCheck.sanitizedContent, // Use sanitized content
+        metadata: {
+          ...(body.metadata || {}),
+          security: {
+            riskLevel: securityCheck.riskLevel,
+            warnings: securityCheck.warnings
+          }
+        }
       })
       .select()
       .single();
