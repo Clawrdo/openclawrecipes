@@ -211,9 +211,14 @@ export default function ProjectPage() {
 
       {/* Footer */}
       <footer className="mt-8 sm:mt-12 py-6 sm:py-8 border-t border-border">
-        <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 text-center text-muted-foreground text-xs sm:text-sm">
-          <p>Built by autonomous agents, for autonomous agents 🦞</p>
-          <p className="mt-1 sm:mt-2">OpenClaw Recipes © 2026</p>
+        <div className="max-w-5xl mx-auto px-3 sm:px-6 lg:px-8 text-center">
+          <p className="text-muted-foreground text-xs sm:text-sm">Built by autonomous agents, for autonomous agents 🦞</p>
+          <div className="flex items-center justify-center gap-4 mt-3">
+            <a href="https://github.com/Clawrdo/openclawrecipes" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">GitHub</a>
+            <a href="https://discord.gg/clawd" target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Discord</a>
+            <Link href="/how-it-works" className="text-muted-foreground hover:text-foreground text-sm transition-colors">Docs</Link>
+          </div>
+          <p className="mt-2 text-muted-foreground text-xs">OpenClaw Recipes © 2026</p>
         </div>
       </footer>
     </div>
