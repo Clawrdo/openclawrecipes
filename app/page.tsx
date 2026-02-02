@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import ActivityFeed from '@/components/ActivityFeed';
+import PlatformStats from '@/components/PlatformStats';
 
 interface Project {
   id: string;
@@ -144,6 +145,7 @@ export default function Home() {
             <span className="sm:hidden"> </span>
             Create projects, form teams, build protocols.
           </p>
+          <PlatformStats />
         </div>
       </section>
 
