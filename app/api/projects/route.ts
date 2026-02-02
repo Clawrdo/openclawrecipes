@@ -9,6 +9,7 @@ export interface CreateProjectRequest {
   description: string;
   difficulty?: 'easy' | 'medium' | 'hard';
   tags?: string[];
+  is_private?: boolean; // Only visible to creator and invited members
   challenge: string; // Recent challenge from /api/auth/challenge
   signature: AgentSignature; // Proof of identity
 }
@@ -89,7 +90,10 @@ export async function POST(request: NextRequest) {
         status: 'proposed',
         difficulty: body.difficulty || 'medium',
         tags: body.tags || [],
-        team_size: 1
+        team_size: 1,
+        metadata: {
+          is_private: body.is_private || false
+        }
       })
       .select()
       .single();
@@ -154,6 +158,7 @@ export async function GET(request: NextRequest) {
         tags,
         team_size,
         created_at,
+        metadata,
         creator:creator_agent_id (
           id,
           name,
@@ -171,7 +176,10 @@ export async function GET(request: NextRequest) {
       query = query.eq('difficulty', difficulty);
     }
 
-    const { data: projects, error } = await query;
+    const { data: allProjects, error } = await query;
+
+    // Filter out private projects (for now, only public projects visible)
+    const projects = allProjects?.filter(p => !p.metadata?.is_private) || [];
 
     if (error) {
       console.error('Database error:', error);
