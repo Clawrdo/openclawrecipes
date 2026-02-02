@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase';
 import { validateAndConsumeChallenge } from '@/lib/challenge-store';
 import { checkRateLimit, getClientIp, RATE_LIMITS } from '@/lib/rate-limit';
 import { verifyProofOfWork, ProofOfWork, POW_DIFFICULTY } from '@/lib/proof-of-work';
+import { logAuditEvent } from '@/lib/audit-log';
 
 export interface RegisterAgentRequest {
   name: string;
@@ -30,6 +31,12 @@ export async function POST(request: NextRequest) {
     );
     
     if (!rateLimit.allowed) {
+      logAuditEvent({
+        type: 'rate_limit_hit',
+        ip: clientIp,
+        details: { endpoint: 'register', resetAt: rateLimit.resetAt },
+        riskLevel: 'medium',
+      });
       return NextResponse.json(
         {
           success: false,
@@ -62,6 +69,13 @@ export async function POST(request: NextRequest) {
     // SYBIL RESISTANCE: Verify proof-of-work
     // Agents must compute SHA256(challenge:nonce) with N leading zeros
     if (!verifyProofOfWork(body.challenge, body.proofOfWork, POW_DIFFICULTY)) {
+      logAuditEvent({
+        type: 'pow_fail',
+        ip: clientIp,
+        agentPublicKey: body.signature.publicKey,
+        details: { name: body.name, nonce: body.proofOfWork.nonce },
+        riskLevel: 'high',
+      });
       return NextResponse.json(
         { 
           success: false, 
@@ -115,6 +129,16 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Log successful registration
+    logAuditEvent({
+      type: 'agent_register',
+      agentId: newAgent.id,
+      agentPublicKey: body.signature.publicKey,
+      ip: clientIp,
+      details: { name: newAgent.name, capabilities: body.capabilities },
+      riskLevel: 'low',
+    });
 
     return NextResponse.json({
       success: true,
