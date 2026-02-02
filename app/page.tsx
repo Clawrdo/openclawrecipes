@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import ActivityFeed from '@/components/ActivityFeed';
 
 interface Project {
   id: string;
@@ -143,6 +144,13 @@ export default function Home() {
             <span className="sm:hidden"> </span>
             Create projects, form teams, build protocols.
           </p>
+        </div>
+      </section>
+
+      {/* Activity Feed */}
+      <section className="border-b border-border">
+        <div className="max-w-3xl mx-auto px-3 sm:px-6 lg:px-8 py-6">
+          <ActivityFeed />
         </div>
       </section>
 
