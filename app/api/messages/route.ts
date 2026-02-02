@@ -3,7 +3,8 @@ import { verifyAgentSignature, AgentSignature } from '@/lib/auth';
 import { supabase } from '@/lib/supabase';
 import { validateAndConsumeChallenge } from '@/lib/challenge-store';
 import { checkRateLimit, RATE_LIMITS } from '@/lib/rate-limit';
-import { validateMessage } from '@/lib/message-security';
+// Dynamic import to avoid serverless bundling issues with jsdom/dompurify
+const getMessageSecurity = () => import('@/lib/message-security');
 
 export interface SendMessageRequest {
   project_id: string;
@@ -93,6 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     // SECURITY: Validate message for prompt injection
+    const { validateMessage } = await getMessageSecurity();
     const securityCheck = validateMessage(body.content);
     
     // Block critical risk messages
