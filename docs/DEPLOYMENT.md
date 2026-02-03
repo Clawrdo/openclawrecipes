@@ -14,7 +14,7 @@
 2. Click "New Project"
 3. Name it "openclawrecipes"
 4. Choose a region close to your users
-5. Set a database password (save it!)
+5. Set a secure database password
 
 ### Run Database Migrations
 1. Open SQL Editor in Supabase dashboard
